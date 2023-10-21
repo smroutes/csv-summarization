@@ -3,6 +3,8 @@ import pandas as pd
 from transformers import T5ForConditionalGeneration, T5Tokenizer, pipeline
 from langchain.llms import HuggingFacePipeline
 from langchain.chains import LLMChain
+from langchain.prompts import PromptTemplate
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 torch.device('mps')
 
@@ -35,16 +37,19 @@ Gaganyaan's crew module escape system will be live tested from Sriharikota. This
 
 
 # Lets define the model and tokenizer 
-tokenizer = T5Tokenizer.from_pretrained(MODEL_NAME)
+tokenizer = T5Tokenizer.from_pretrained(MODEL_NAME, legacy = True)
 model = T5ForConditionalGeneration.from_pretrained(MODEL_NAME)
 
 localPipeline = pipeline(
     'summarization',
     model = model,
     tokenizer = tokenizer,
-    max_lenght = 100,
     batch_size = 1,
-    model_kwargs = { "temperature": 0.8 }
+    model_kwargs = { 
+        "temperature": 0.8, 
+        "max_lenght": 100,
+        "padding": True
+    }
 )
 
 
@@ -74,8 +79,41 @@ def generate_summary(text):
 
     return summary
 
-summary = generate_summary(combinedText)
+# summary = generate_summary(combinedText)
 
-print("\n ------------ \n")
-print(summary)
-print("\n ------------ \n")
+# print("\n ------------ \n")
+# print(summary)
+# print("\n ------------ \n")
+
+
+template = """
+    Being a responsible text summarisation model, you always provide non toxic, positive text summarised.
+    given the text content {article} I want you to create:
+        1. Summary of the text content in 5 words only
+"""
+
+prompt = PromptTemplate( 
+    input_variables = ["article"], 
+    template = template
+)
+chain = LLMChain( llm = localLlm, prompt = prompt);
+
+# result = chain.run(article = combinedText)
+
+text_splitter = RecursiveCharacterTextSplitter(
+    chunk_size = 2048,
+    chunk_overlap = 128
+)
+
+chunks = text_splitter.create_documents([ combinedText ])
+
+print(len(chunks))
+
+# summary = ''
+for chunk in chunks:
+    summary = chain.run(article = chunk)
+    print(summary)
+
+# print(summary)
+
+# print(result)
