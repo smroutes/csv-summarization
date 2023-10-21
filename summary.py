@@ -44,7 +44,7 @@ localPipeline = pipeline(
     tokenizer = tokenizer,
     max_lenght = 100,
     batch_size = 1,
-    legacy = False
+    model_kwargs = { "temperature": 0.8 }
 )
 
 
