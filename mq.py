@@ -37,10 +37,16 @@ class RabbitMQChannel:
         self.channel = self.connection.channel()
 
         self.ROUTING_INPUT_QUEUE = constants.ROUTING_INPUT_QUEUE
-        self.channel.queue_declare(self.ROUTING_INPUT_QUEUE)
+        self.channel.queue_declare(
+            queue = self.ROUTING_INPUT_QUEUE,
+            durable = True
+        )
 
         self.ROUTING_OUTPUT_QUEUE = constants.ROUTING_OUTPUT_QUEUE
-        self.channel.queue_declare(self.ROUTING_OUTPUT_QUEUE)
+        self.channel.queue_declare(
+            queue = self.ROUTING_OUTPUT_QUEUE,
+            durable = True
+        )
 
     def get_channel(self):
         return self.channel

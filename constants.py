@@ -1,3 +1,3 @@
 
 ROUTING_INPUT_QUEUE = 'ml.input'
-ROUTING_OUTPUT_QUEUE = 'ml.ouput'
+ROUTING_OUTPUT_QUEUE = 'ml.output'
