@@ -25,8 +25,9 @@ localPipeline = pipeline(
 localLlm = HuggingFacePipeline( pipeline = localPipeline )
 
 template = """
-    Offer a short summary that captures the essence of the article below without going into unnecessary detail.
-    {article}
+    Offer a short summary that captures the essence of the article below after ### Article string without going into unnecessary detail.
+
+    \n### Article {article}
 """
 
 prompt = PromptTemplate( 

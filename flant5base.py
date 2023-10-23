@@ -27,9 +27,9 @@ localLlm = HuggingFacePipeline( pipeline = localPipeline )
 # Prompts
 # 1. Please condense the {article} into a brief summary, highlighting the most important information.
 
-
 template = """
-    Offer a short summary that captures the essence of the article below without going into unnecessary detail.
+    Offer a short summary that captures the essence of the article below after the "---" without going into unnecessary detail. 
+    "---"
     \n{article}\n
 """
 
