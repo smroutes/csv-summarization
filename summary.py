@@ -1,36 +1,27 @@
+import os
 import pandas as pd
-from lamini import getSummary
-from flant5base import getSummary as getSummaryFromFlatT5
+from lamini import getSummary as lamminiSummary
+from flant5base import getSummary as flant5Summary
 
-CSV_FILE = 'feedback.csv'
+DATA_DIRECTORY = os.path.join(os.getcwd(), '..', 'data')
+ALLOWED_MODEL = { 
+    "lamini": lamminiSummary, 
+    "flant5base": flant5Summary
+}
 
-# import the csv file
-df = pd.read_csv(CSV_FILE)
+def generateSummary(fileName, columnName, modelName) :
+    print(f"Summary asked for {fileName} at {columnName} using {modelName}")
 
-print(f"\n--- Total record found %d ---\n" % (len(df)))
-feedbackText = ". ".join(df["What could be improved about this session?"])
-topicsText = ". ".join(df['What other topics related to this topic would you like to see covered in future sessions?'])
+    file = os.path.join(DATA_DIRECTORY, fileName)
 
-# feedbackFile = open("feedback.txt", "x")
-# feedbackFile.write(feedbackText)
-# feedbackFile.close()
+    if(os.path.exists(file)):
+        df = pd.read_csv(file)
+        capturedText = ". ".join(df.head(50)[columnName])
 
-print("\n---- LAMINI -----\n")
-print("\n Feedback Text \n")
-summary = getSummary(feedbackText)
-print(summary)
-
-print("\n---- FLAN-t5-base -----\n")
-print("\n Feedback Text \n")
-summary = getSummaryFromFlatT5(feedbackText)
-print(summary)
-
-print("\n---- LAMINI -----\n")
-print("\n Topics Text \n")
-summary = getSummary(topicsText)
-print(summary)
-
-print("\n---- FLAN-t5-base -----\n")
-print("\n Topics Text \n")
-summary = getSummaryFromFlatT5(topicsText)
-print(summary)
+        if modelName not in list(ALLOWED_MODEL.keys()):
+            raise Exception("Invalid Model !")
+        
+        summary = ALLOWED_MODEL.get(modelName)(capturedText)
+        return summary
+    else: 
+        raise Exception("Invalid file !")
