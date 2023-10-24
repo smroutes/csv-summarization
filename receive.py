@@ -3,7 +3,7 @@ import json, sys, os
 import constants
 from utils import sendMessage
 from mq import RabbitMQChannel
-from summary import generateSummary
+from summary import generateSummary, textSummary
 
 rabbitmq = RabbitMQChannel()
 channel = rabbitmq.get_channel()
@@ -24,19 +24,26 @@ def check_keys_exist(dictionary, keys_to_check):
 def callback(ch, method, properties, body):
     try:
         inputParams = json.loads(body)
-        check_keys_exist(inputParams, ["fileName", "columnName", "modelName"])
+        summary = ''
 
-        print(inputParams)
-        summary = generateSummary(
-            fileName = inputParams.get('fileName'),
-            columnName = inputParams.get('columnName'),
-            modelName = inputParams.get('modelName')
-        )
+        if 'text' in inputParams:
+            print("text summarization.")
+            summary = textSummary(inputParams.get('text'))
+        else:
+            check_keys_exist(inputParams, ["fileName", "columnName", "modelName", "rowCount"])
+
+            print(inputParams)
+            summary = generateSummary(
+                fileName = inputParams.get('fileName'),
+                columnName = inputParams.get('columnName'),
+                modelName = inputParams.get('modelName'),
+                rowCount = inputParams.get('rowCount')
+            )
 
         print(summary)
         sendMessage({ 'summary': summary }, constants.ROUTING_OUTPUT_QUEUE)
     except Exception as e:
-        print(str(e))
+        print(e)
         sendMessage({ 'error': str(e) }, constants.ROUTING_OUTPUT_QUEUE)
 
 
