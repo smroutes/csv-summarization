@@ -5,8 +5,8 @@ from flant5base import getSummary as flant5Summary
 
 DATA_DIRECTORY = os.path.join(os.getcwd(), '..', 'data')
 ALLOWED_MODEL = { 
-    "lamini": lamminiSummary, 
-    "flant5base": flant5Summary
+    "MBZUAI/LaMini-Flan-T5-248M": lamminiSummary, 
+    "Google/flan-t5-base": flant5Summary
 }
 
 def generateSummary(fileName, columnName, modelName) :
