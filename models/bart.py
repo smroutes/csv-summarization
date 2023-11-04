@@ -41,5 +41,7 @@ prompt = PromptTemplate(
 chain = LLMChain( llm = localLlm, prompt = prompt);
 
 def getSummary(article):
+    if len(article) < 10:
+        return "Input must contain some text."
     result = chain.run(article = article)
     return result
